@@ -1,0 +1,53 @@
+version: smartide/v0.2
+orchestrator:
+  type: docker-compose
+  version: 3
+workspace:
+  dev-container:
+    service-name: product-service-dev
+    webide-port: 6800
+  services:
+
+    product-service-dev:
+      container_name: product-service-dev
+      image: registry.cn-hangzhou.aliyuncs.com/smartide/smartide-java:latest
+      restart: always
+      environment:
+        POSTGRES_HOST_AUTH_METHOD: trust
+        ROOT_PASSWORD: root123
+        TZ: Asia/Shanghai
+      volumes:
+        - $HOME/.m2/repository:/root/.m2/repository
+        - .:/home/project
+      expose:
+        - 3000
+      networks:
+        - smartide-network
+    mysql:
+      image: registry.cn-qingdao.aliyuncs.com/metersphere/mysql:5.7.33
+      container_name: mysql
+      healthcheck:
+        test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MS_MYSQL_PASSWORD}" ]
+        interval: 6s
+        timeout: 5s
+        retries: 10
+      environment:
+        MYSQL_DATABASE: metersphere
+        MYSQL_ROOT_PASSWORD: Password123@mysql
+      ports:
+        - 3307:3306
+      volumes:
+        - /opt/metersphere/conf/my.cnf:/etc/mysql/conf.d/my.cnf
+        - /opt/metersphere/bin/mysql:/docker-entrypoint-initdb.d/
+        - ms-mysql-data:/var/lib/mysql
+      networks:
+        - smartide-network
+  networks:
+    smartide-network:
+      external: true
+  volumes:
+    ms-mysql-data:
+      driver_opts:
+        type: none
+        device: /opt/metersphere/data/mysql
+        o: bind
