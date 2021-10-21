@@ -4,25 +4,23 @@ orchestrator:
   version: 3
 workspace:
   dev-container:
-    service-name: product-service-dev
+    service-name: metersphere
     webide-port: 6800
   services:
 
-    product-service-dev:
-      container_name: product-service-dev
-      image: registry.cn-hangzhou.aliyuncs.com/smartide/smartide-java:latest
+    metersphere:
+      image: registry.cn-hangzhou.aliyuncs.com/smartide/smartide-java-opvscode:latest
       restart: always
       environment:
         POSTGRES_HOST_AUTH_METHOD: trust
         ROOT_PASSWORD: root123
-        TZ: Asia/Shanghai
       volumes:
-        - $HOME/.m2/repository:/root/.m2/repository
         - .:/home/project
       expose:
         - 3000
       networks:
         - smartide-network
+
     mysql:
       image: registry.cn-qingdao.aliyuncs.com/metersphere/mysql:5.7.33
       container_name: mysql
@@ -37,7 +35,7 @@ workspace:
       ports:
         - 3307:3306
       volumes:
-        - /opt/metersphere/conf/my.cnf:/etc/mysql/conf.d/my.cnf
+        - ./.ide/conf/my.cnf:/etc/mysql/conf.d/my.cnf
         - /opt/metersphere/bin/mysql:/docker-entrypoint-initdb.d/
         - ms-mysql-data:/var/lib/mysql
       networks:
