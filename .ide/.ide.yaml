@@ -16,6 +16,7 @@ workspace:
         ROOT_PASSWORD: root123
       volumes:
         - .:/home/project
+        - ./.ide/opt/metersphere:/opt/metersphere
       expose:
         - 3000
       networks:
@@ -35,8 +36,8 @@ workspace:
       ports:
         - 3307:3306
       volumes:
-        - ./.ide/conf/my.cnf:/etc/mysql/conf.d/my.cnf
-        - /opt/metersphere/bin/mysql:/docker-entrypoint-initdb.d/
+        - ./.ide/opt/metersphere/conf/my.cnf:/etc/mysql/conf.d/my.cnf
+        - ./.ide/opt/metersphere/bin/mysql:/docker-entrypoint-initdb.d/
         - ms-mysql-data:/var/lib/mysql
       networks:
         - smartide-network
@@ -47,5 +48,5 @@ workspace:
     ms-mysql-data:
       driver_opts:
         type: none
-        device: /opt/metersphere/data/mysql
+        device: ./.ide/opt/metersphere/data/mysql
         o: bind

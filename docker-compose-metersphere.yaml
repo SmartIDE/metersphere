@@ -1,0 +1,39 @@
+version: "3"
+services:
+  metersphere:
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      ROOT_PASSWORD: root123
+    image: registry.cn-hangzhou.aliyuncs.com/smartide/smartide-java-opvscode:latest
+    networks:
+    - smartide-network
+    ports:
+    - 6800:3000
+    - "6822:22"
+    restart: always
+    volumes:
+    - .:/home/project
+    - ./.ide/opt/metersphere:/opt/metersphere
+  mysql:
+    container_name: mysql
+    environment:
+      MYSQL_DATABASE: metersphere
+      MYSQL_ROOT_PASSWORD: Password123@mysql
+    image: registry.cn-qingdao.aliyuncs.com/metersphere/mysql:5.7.33
+    networks:
+    - smartide-network
+    ports:
+    - 3307:3306
+    volumes:
+    - ./.ide/opt/metersphere/conf/my.cnf:/etc/mysql/conf.d/my.cnf
+    - ./.ide/opt/metersphere/bin/mysql:/docker-entrypoint-initdb.d/
+    - ms-mysql-data:/var/lib/mysql
+networks:
+  smartide-network:
+    external: true
+volumes:
+  ms-mysql-data:
+    driver_opts:
+      type: none
+      device: ./.ide/opt/metersphere/data/mysql
+      o: bind
