@@ -33,3 +33,5 @@ target
 .classpath
 .jython_cache
 qywx.json
+*.log
+.ide/opt/metersphere/data/mysql/*   
