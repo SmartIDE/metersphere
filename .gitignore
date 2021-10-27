@@ -35,3 +35,4 @@ target
 qywx.json
 *.log
 .ide/opt/metersphere/data/mysql/*   
+.ide/vmstart.txt
