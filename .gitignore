@@ -36,3 +36,6 @@ qywx.json
 *.log
 .ide/opt/metersphere/data/mysql/*   
 .ide/vmstart.txt
+metersphere-online-installer-v1.14.0-rc2.tar.gz
+metersphere-online-installer-v1.14.0-rc2/*
+quick_start.sh
