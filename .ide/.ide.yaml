@@ -19,6 +19,8 @@ workspace:
         - ./.ide/opt/metersphere:/opt/metersphere
       expose:
         - 3000
+      ports:
+          - 8081:8081
       networks:
         - smartide-network
 
