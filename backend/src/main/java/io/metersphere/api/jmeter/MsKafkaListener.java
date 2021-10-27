@@ -58,10 +58,6 @@ public class MsKafkaListener {
 
     private void save(String execResult) {
         TestResult testResult = this.formatResult(execResult);
-        String testId = testResult.getTestId();
         testResultService.saveResult(testResult, testResult.getRunMode(), null, testResult.getTestId());
-        if (StringUtils.isNotEmpty(testId)) {
-            MessageCache.executionQueue.remove(testId);
-        }
     }
 }

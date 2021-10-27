@@ -37,6 +37,10 @@
             <el-link type="primary" style="margin-left: 10px" @click="openHis(apiCase)" v-if="apiCase.id">{{ $t('operating_log.change_history') }}</el-link>
           </span>
           <div v-if="apiCase.id" style="color: #999999;font-size: 12px">
+            <!--<span>-->
+            <!--{{ apiCase.createTime | timestampFormatDate }}-->
+            <!--{{ apiCase.createUser }} {{ $t('api_test.definition.request.create_info') }}-->
+            <!--</span>-->
             <span style="margin-left: 10px">
               {{ apiCase.updateTime | timestampFormatDate }}
               {{ apiCase.updateUser }} {{ $t('api_test.definition.request.update_info') }}
@@ -54,32 +58,26 @@
             </el-tooltip>
          </span>
         </el-col>
-        <el-col :span="6">
-          <el-row>
-            <el-col :span="8">
-              <el-select size="small" v-model="apiCase.caseStatus" style="margin-right: 5px" @change="saveTestCase(apiCase,true)">
-                <el-option v-for="item in options" :key="item.id" :label="$t(item.label)" :value="item.id"/>
-              </el-select>
-            </el-col>
-            <el-col :span="16">
-              <div class="tag-item" @click.stop>
-                <el-select v-model="apiCase.followPeople" clearable :placeholder="$t('api_test.automation.follow_people')" filterable size="small"
-                           @change="saveTestCase(apiCase,true)" style="width: 100%">
-                  <el-option
-                    v-for="item in maintainerOptions"
-                    :key="item.id"
-                    :label="item.id + ' (' + item.name + ')'"
-                    :value="item.id">
-                  </el-option>
-                </el-select>
-              </div>
-            </el-col>
-          </el-row>
-          <el-row style="margin-top: 5px">
-            <div class="tag-item" @click.stop>
-              <ms-input-tag :currentScenario="apiCase" ref="tag" @keyup.enter.native="saveTestCase(apiCase,true)"/>
-            </div>
-          </el-row>
+        <el-col :span="3">
+          <div class="tag-item" @click.stop>
+            <ms-input-tag :currentScenario="apiCase" ref="tag" @keyup.enter.native="saveTestCase(apiCase,true)"/>
+          </div>
+        </el-col>
+
+        <el-col :span="3">
+          <div class="tag-item" @click.stop>
+            <el-select v-model="apiCase.followPeople"
+                       clearable
+                       :placeholder="$t('api_test.automation.follow_people')" filterable size="small"
+                       @change="saveTestCase(apiCase,true)">
+              <el-option
+                v-for="item in maintainerOptions"
+                :key="item.id"
+                :label="item.id + ' (' + item.name + ')'"
+                :value="item.id">
+              </el-option>
+            </el-select>
+          </div>
         </el-col>
 
         <el-col :span="3">
@@ -158,7 +156,7 @@
 
 <script>
 import {_getBodyUploadFiles, getCurrentProjectID, getUUID} from "@/common/js/utils";
-import {API_STATUS, PRIORITY} from "../../model/JsonData";
+import {PRIORITY} from "../../model/JsonData";
 import MsTag from "../../../../common/components/MsTag";
 import MsTipButton from "../../../../common/components/MsTipButton";
 import MsApiRequestForm from "../request/http/ApiHttpRequestForm";
@@ -216,7 +214,6 @@ export default {
   },
   data() {
     return {
-      options: API_STATUS,
       result: {},
       grades: [],
       resultMap: new Map([

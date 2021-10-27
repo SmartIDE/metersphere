@@ -32,7 +32,7 @@ public class IntegrationService {
     public ServiceIntegration save(ServiceIntegration service) {
         ServiceIntegrationExample example = new ServiceIntegrationExample();
         example.createCriteria()
-                .andWorkspaceIdEqualTo(service.getWorkspaceId())
+                .andOrganizationIdEqualTo(service.getOrganizationId())
                 .andPlatformEqualTo(service.getPlatform());
         List<ServiceIntegration> list = serviceIntegrationMapper.selectByExample(example);
         if (!CollectionUtils.isEmpty(list)) {
@@ -47,7 +47,7 @@ public class IntegrationService {
 
     public ServiceIntegration get(IntegrationRequest request) {
         String platform = request.getPlatform();
-        String workspaceId = request.getWorkspaceId();
+        String orgId = request.getOrgId();
         ServiceIntegrationExample example = new ServiceIntegrationExample();
         ServiceIntegrationExample.Criteria criteria = example.createCriteria();
 
@@ -55,8 +55,8 @@ public class IntegrationService {
             criteria.andPlatformEqualTo(platform);
         }
 
-        if (StringUtils.isNotBlank(workspaceId)) {
-            criteria.andWorkspaceIdEqualTo(workspaceId);
+        if (StringUtils.isNotBlank(orgId)) {
+            criteria.andOrganizationIdEqualTo(orgId);
         }
 
         List<ServiceIntegration> list = serviceIntegrationMapper.selectByExampleWithBLOBs(example);
@@ -65,19 +65,19 @@ public class IntegrationService {
 
     public void delete(IntegrationRequest request) {
         String platform = request.getPlatform();
-        String workspaceId = request.getWorkspaceId();
+        String orgId = request.getOrgId();
         ServiceIntegrationExample example = new ServiceIntegrationExample();
         example.createCriteria()
-                .andWorkspaceIdEqualTo(workspaceId)
+                .andOrganizationIdEqualTo(orgId)
                 .andPlatformEqualTo(platform);
         serviceIntegrationMapper.deleteByExample(example);
         // 删除项目关联的id/key
-        extProjectMapper.removeIssuePlatform(platform, workspaceId);
+        extProjectMapper.removeIssuePlatform(platform, orgId);
     }
 
-    public List<ServiceIntegration> getAll(String workspaceId) {
+    public List<ServiceIntegration> getAll(String orgId) {
         ServiceIntegrationExample example = new ServiceIntegrationExample();
-        example.createCriteria().andWorkspaceIdEqualTo(workspaceId);
+        example.createCriteria().andOrganizationIdEqualTo(orgId);
         List<ServiceIntegration> list = serviceIntegrationMapper.selectByExample(example);
         return CollectionUtils.isEmpty(list) ? new ArrayList<>() : list;
     }

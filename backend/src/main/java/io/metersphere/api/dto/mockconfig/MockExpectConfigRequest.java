@@ -27,6 +27,4 @@ public class MockExpectConfigRequest {
     private Object response;
 
     private String status;
-
-    private String copyId;
 }

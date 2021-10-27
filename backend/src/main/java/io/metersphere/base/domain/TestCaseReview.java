@@ -1,7 +1,8 @@
 package io.metersphere.base.domain;
 
-import java.io.Serializable;
 import lombok.Data;
+
+import java.io.Serializable;
 
 @Data
 public class TestCaseReview implements Serializable {
@@ -24,8 +25,6 @@ public class TestCaseReview implements Serializable {
     private String tags;
 
     private String createUser;
-
-    private String followPeople;
 
     private String description;
 

@@ -1,7 +1,6 @@
 package io.metersphere.api.tcp.server;
 
 import com.alibaba.fastjson.JSONObject;
-import io.metersphere.api.dto.mock.MockApiUtils;
 import io.metersphere.api.service.MockConfigService;
 import io.metersphere.base.domain.MockExpectConfigWithBLOBs;
 import io.metersphere.commons.utils.CommonBeanFactory;
@@ -51,14 +50,7 @@ public class TCPServicer {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            if(responseObj.containsKey("responseResult")){
-                JSONObject respResultObj = responseObj.getJSONObject("responseResult");
-                if(respResultObj.containsKey("body")){
-                    returnMsg = MockApiUtils.getResultByResponseResult(respResultObj.getJSONObject("body"),"",null,null);
-                }
-            }else {
-                returnMsg = responseObj.getString("body");
-            }
+            returnMsg = responseObj.getString("body");
         }
         return returnMsg;
     }

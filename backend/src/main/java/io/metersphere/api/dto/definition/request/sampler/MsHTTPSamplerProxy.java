@@ -175,7 +175,7 @@ public class MsHTTPSamplerProxy extends MsTestElement {
         if (StringUtils.isEmpty(this.getEnvironmentId())) {
             this.setEnvironmentId(this.useEnvironment);
         }
-        // 非导出操作，且不是启用状态则跳过执行Ms
+        // 非导出操作，且不是启用状态则跳过执行
         if (!config.isOperating() && !this.isEnable()) {
             return;
         }
@@ -270,6 +270,10 @@ public class MsHTTPSamplerProxy extends MsTestElement {
 
         addCertificate(config, httpSamplerTree);
 
+        //增加全局前后至脚本
+        if (httpConfig != null) {
+            this.setScript(httpConfig, httpSamplerTree, config);
+        }
         if (CollectionUtils.isNotEmpty(hashTree)) {
             for (MsTestElement el : hashTree) {
                 if (el.getEnvironmentId() == null) {
@@ -284,6 +288,32 @@ public class MsHTTPSamplerProxy extends MsTestElement {
         }
 
     }
+
+    private void setScript(HttpConfig httpConfig, HashTree httpSamplerTree, ParameterConfig config) {
+        MsJSR223PreProcessor preProcessor = httpConfig.getPreProcessor();
+        MsJSR223PostProcessor postProcessor = httpConfig.getPostProcessor();
+        if (preProcessor != null && StringUtils.isNotEmpty(preProcessor.getScript())) {
+            if (preProcessor.getEnvironmentId() == null) {
+                if (this.getEnvironmentId() == null) {
+                    preProcessor.setEnvironmentId(useEnvironment);
+                } else {
+                    preProcessor.setEnvironmentId(this.getEnvironmentId());
+                }
+            }
+            preProcessor.toHashTree(httpSamplerTree, preProcessor.getHashTree(), config);
+        }
+        if (postProcessor != null && StringUtils.isNotEmpty(postProcessor.getScript())) {
+            if (postProcessor.getEnvironmentId() == null) {
+                if (this.getEnvironmentId() == null) {
+                    postProcessor.setEnvironmentId(useEnvironment);
+                } else {
+                    postProcessor.setEnvironmentId(this.getEnvironmentId());
+                }
+            }
+            postProcessor.toHashTree(httpSamplerTree, postProcessor.getHashTree(), config);
+        }
+    }
+
     private void initConnectAndResponseTimeout(ParameterConfig config) {
         if (config.isEffective(this.getProjectId())) {
             String useEvnId = config.getConfig().get(this.getProjectId()).getApiEnvironmentid();
@@ -328,6 +358,8 @@ public class MsHTTPSamplerProxy extends MsTestElement {
                     this.setEnvironmentId(useEvnId);
                 }
                 HttpConfig httpConfig = matchConfig(config);
+                httpConfig.setPreProcessor(environmentConfig.getPreProcessor());
+                httpConfig.setPostProcessor(environmentConfig.getPostProcessor());
                 return httpConfig;
             }
         }
@@ -356,7 +388,7 @@ public class MsHTTPSamplerProxy extends MsTestElement {
                 if (isUrl()) {
                     if (this.isCustomizeReq()) {
                         url = this.getUrl();
-                        sampler.setProperty("HTTPSampler.path", url);
+                        sampler.setPath(url);
                     }
                     if (StringUtils.isNotEmpty(this.getPort()) && this.getPort().startsWith("${")) {
                         url = url.replace(this.getPort(), "10990");
@@ -371,7 +403,7 @@ public class MsHTTPSamplerProxy extends MsTestElement {
                             sampler.setPort(urlObject.getPort());
                         }
                         sampler.setProtocol(urlObject.getProtocol());
-                        sampler.setProperty("HTTPSampler.path", URLDecoder.decode(URLEncoder.encode(urlObject.getFile(), "UTF-8"), "UTF-8"));
+                        sampler.setPath(URLDecoder.decode(URLEncoder.encode(urlObject.getFile(), "UTF-8"), "UTF-8"));
                     } catch (Exception e) {
                         LogUtil.error(e.getMessage(), e);
                     }
@@ -401,13 +433,13 @@ public class MsHTTPSamplerProxy extends MsTestElement {
                             sampler.setDomain(URLDecoder.decode(urlObject.getHost(), "UTF-8"));
                             sampler.setProtocol(urlObject.getProtocol());
                         }
-                        sampler.setProperty("HTTPSampler.path", URLDecoder.decode(URLEncoder.encode(envPath, "UTF-8"), "UTF-8"));
+                        sampler.setPath(URLDecoder.decode(URLEncoder.encode(envPath, "UTF-8"), "UTF-8"));
                     }
                 }
                 String envPath = sampler.getPath();
                 if (CollectionUtils.isNotEmpty(this.getRest()) && this.isRest()) {
                     envPath = getRestParameters(envPath);
-                    sampler.setProperty("HTTPSampler.path", envPath);
+                    sampler.setPath(envPath);
                 }
                 if (CollectionUtils.isNotEmpty(this.getArguments())) {
                     String path = getPostQueryParameters(envPath);
@@ -445,13 +477,13 @@ public class MsHTTPSamplerProxy extends MsTestElement {
                 }
                 sampler.setProtocol(urlObject.getProtocol());
                 String envPath = StringUtils.equals(urlObject.getPath(), "/") ? "" : urlObject.getFile();
-                sampler.setProperty("HTTPSampler.path", envPath);
+                sampler.setPath(envPath);
                 if (CollectionUtils.isNotEmpty(this.getRest()) && this.isRest()) {
                     envPath = getRestParameters(URLDecoder.decode(URLEncoder.encode(envPath, "UTF-8"), "UTF-8"));
-                    sampler.setProperty("HTTPSampler.path", envPath);
+                    sampler.setPath(envPath);
                 }
                 if (CollectionUtils.isNotEmpty(this.getArguments())) {
-                    sampler.setProperty("HTTPSampler.path", getPostQueryParameters(URLDecoder.decode(URLEncoder.encode(envPath, "UTF-8"), "UTF-8")));
+                    sampler.setPath(getPostQueryParameters(URLDecoder.decode(URLEncoder.encode(envPath, "UTF-8"), "UTF-8")));
                 }
             }
         } catch (Exception e) {
@@ -725,9 +757,6 @@ public class MsHTTPSamplerProxy extends MsTestElement {
                         apiDefinition = apiDefinitionService.get(this.getId());
                         if (apiDefinition == null) {
                             ApiTestCaseWithBLOBs apiTestCaseWithBLOBs = apiTestCaseService.get(this.getId());
-                            if (apiTestCaseWithBLOBs == null) {
-                                apiTestCaseWithBLOBs = apiTestCaseService.get(this.getName());
-                            }
                             if (apiTestCaseWithBLOBs != null) {
                                 apiDefinition = apiDefinitionService.get(apiTestCaseWithBLOBs.getApiDefinitionId());
                             } else {

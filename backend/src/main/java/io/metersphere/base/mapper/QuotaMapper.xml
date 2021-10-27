@@ -8,6 +8,7 @@
     <result column="max_threads" jdbcType="INTEGER" property="maxThreads" />
     <result column="duration" jdbcType="INTEGER" property="duration" />
     <result column="resource_pool" jdbcType="VARCHAR" property="resourcePool" />
+    <result column="organization_id" jdbcType="VARCHAR" property="organizationId" />
     <result column="workspace_id" jdbcType="VARCHAR" property="workspaceId" />
     <result column="use_default" jdbcType="BIT" property="useDefault" />
     <result column="update_time" jdbcType="BIGINT" property="updateTime" />
@@ -71,8 +72,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, api, performance, max_threads, duration, resource_pool, workspace_id, use_default, 
-    update_time
+    id, api, performance, max_threads, duration, resource_pool, organization_id, workspace_id, 
+    use_default, update_time
   </sql>
   <select id="selectByExample" parameterType="io.metersphere.base.domain.QuotaExample" resultMap="BaseResultMap">
     select
@@ -107,12 +108,12 @@
   <insert id="insert" parameterType="io.metersphere.base.domain.Quota">
     insert into quota (id, api, performance, 
       max_threads, duration, resource_pool, 
-      workspace_id, use_default, update_time
-      )
+      organization_id, workspace_id, use_default, 
+      update_time)
     values (#{id,jdbcType=VARCHAR}, #{api,jdbcType=INTEGER}, #{performance,jdbcType=INTEGER}, 
       #{maxThreads,jdbcType=INTEGER}, #{duration,jdbcType=INTEGER}, #{resourcePool,jdbcType=VARCHAR}, 
-      #{workspaceId,jdbcType=VARCHAR}, #{useDefault,jdbcType=BIT}, #{updateTime,jdbcType=BIGINT}
-      )
+      #{organizationId,jdbcType=VARCHAR}, #{workspaceId,jdbcType=VARCHAR}, #{useDefault,jdbcType=BIT}, 
+      #{updateTime,jdbcType=BIGINT})
   </insert>
   <insert id="insertSelective" parameterType="io.metersphere.base.domain.Quota">
     insert into quota
@@ -134,6 +135,9 @@
       </if>
       <if test="resourcePool != null">
         resource_pool,
+      </if>
+      <if test="organizationId != null">
+        organization_id,
       </if>
       <if test="workspaceId != null">
         workspace_id,
@@ -163,6 +167,9 @@
       </if>
       <if test="resourcePool != null">
         #{resourcePool,jdbcType=VARCHAR},
+      </if>
+      <if test="organizationId != null">
+        #{organizationId,jdbcType=VARCHAR},
       </if>
       <if test="workspaceId != null">
         #{workspaceId,jdbcType=VARCHAR},
@@ -202,6 +209,9 @@
       <if test="record.resourcePool != null">
         resource_pool = #{record.resourcePool,jdbcType=VARCHAR},
       </if>
+      <if test="record.organizationId != null">
+        organization_id = #{record.organizationId,jdbcType=VARCHAR},
+      </if>
       <if test="record.workspaceId != null">
         workspace_id = #{record.workspaceId,jdbcType=VARCHAR},
       </if>
@@ -224,6 +234,7 @@
       max_threads = #{record.maxThreads,jdbcType=INTEGER},
       duration = #{record.duration,jdbcType=INTEGER},
       resource_pool = #{record.resourcePool,jdbcType=VARCHAR},
+      organization_id = #{record.organizationId,jdbcType=VARCHAR},
       workspace_id = #{record.workspaceId,jdbcType=VARCHAR},
       use_default = #{record.useDefault,jdbcType=BIT},
       update_time = #{record.updateTime,jdbcType=BIGINT}
@@ -249,6 +260,9 @@
       <if test="resourcePool != null">
         resource_pool = #{resourcePool,jdbcType=VARCHAR},
       </if>
+      <if test="organizationId != null">
+        organization_id = #{organizationId,jdbcType=VARCHAR},
+      </if>
       <if test="workspaceId != null">
         workspace_id = #{workspaceId,jdbcType=VARCHAR},
       </if>
@@ -268,6 +282,7 @@
       max_threads = #{maxThreads,jdbcType=INTEGER},
       duration = #{duration,jdbcType=INTEGER},
       resource_pool = #{resourcePool,jdbcType=VARCHAR},
+      organization_id = #{organizationId,jdbcType=VARCHAR},
       workspace_id = #{workspaceId,jdbcType=VARCHAR},
       use_default = #{useDefault,jdbcType=BIT},
       update_time = #{updateTime,jdbcType=BIGINT}

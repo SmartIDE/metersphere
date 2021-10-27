@@ -49,6 +49,12 @@ export default {
   inject: [
     'reload'
   ],
+  computed: {
+    ...mapGetters([
+      'isNewVersion',
+      'isOldVersion',
+    ]),
+  },
   data() {
     return {
       result: {},
@@ -153,6 +159,5 @@ export default {
 .el-icon-check {
   color: #773888;
   margin-left: 10px;
-  font-weight: bold;
 }
 </style>

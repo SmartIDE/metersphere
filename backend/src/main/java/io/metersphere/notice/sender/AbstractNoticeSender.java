@@ -15,7 +15,6 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -101,26 +100,13 @@ public abstract class AbstractNoticeSender implements NoticeSender {
         if (MapUtils.isNotEmpty(context)) {
             for (String k : context.keySet()) {
                 if (context.get(k) != null) {
-                    String value = handleTime(k, context);
-                    template = RegExUtils.replaceAll(template, "\\$\\{" + k + "}", value);
+                    template = RegExUtils.replaceAll(template, "\\$\\{" + k + "}", context.get(k).toString());
                 } else {
                     template = RegExUtils.replaceAll(template, "\\$\\{" + k + "}", "");
                 }
             }
         }
         return template;
-    }
-
-    private String handleTime(String k, Map<String, Object> context) {
-        String value = context.get(k).toString();
-        if (StringUtils.endsWithIgnoreCase(k, "Time")) {
-            try {
-                long time = Long.parseLong(value);
-                value = DateFormatUtils.format(time, "yyyy-MM-dd HH:mm:ss");
-            } catch (Exception ignore) {
-            }
-        }
-        return value;
     }
 
     protected List<UserDetail> getUserDetails(List<String> userIds) {

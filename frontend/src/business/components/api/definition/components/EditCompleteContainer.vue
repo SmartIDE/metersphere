@@ -74,12 +74,10 @@
     </div>
 
     <div v-if="showMock && (currentProtocol === 'HTTP')" class="ms-api-div">
-<!--      <mock-config :base-mock-config-data="baseMockConfigData" type="http"/>-->
-      <mock-tab :base-mock-config-data="baseMockConfigData" :is-tcp="false"/>
+      <mock-config :base-mock-config-data="baseMockConfigData" type="http"/>
     </div>
     <div v-if="showMock && (currentProtocol === 'TCP')" class="ms-api-div">
-      <mock-tab :base-mock-config-data="baseMockConfigData" :is-tcp="true"/>
-<!--      <tcp-mock-config :base-mock-config-data="baseMockConfigData" type="tcp"/>-->
+      <tcp-mock-config :base-mock-config-data="baseMockConfigData" type="tcp"/>
     </div>
     <div v-if="showTestCaseList">
       <!--测试用例列表-->
@@ -106,7 +104,7 @@ import MsRunTestHttpPage from "./runtest/RunTestHTTPPage";
 import MsRunTestTcpPage from "./runtest/RunTestTCPPage";
 import MsRunTestSqlPage from "./runtest/RunTestSQLPage";
 import MsRunTestDubboPage from "./runtest/RunTestDubboPage";
-import MockTab from "@/business/components/api/definition/components/mock/MockTab";
+import MockConfig from "@/business/components/api/definition/components/mock/MockConfig";
 import TcpMockConfig from "@/business/components/api/definition/components/mock/TcpMockConfig";
 import ApiCaseSimpleList from "./list/ApiCaseSimpleList";
 import MsApiCaseList from "./case/ApiCaseList";
@@ -122,7 +120,7 @@ export default {
     MsRunTestTcpPage,
     MsRunTestSqlPage,
     MsRunTestDubboPage,
-    MockTab,
+    MockConfig,
     TcpMockConfig,
     ApiCaseSimpleList,
     MsApiCaseList
@@ -205,16 +203,14 @@ export default {
           this.currentApi.request = JSON.parse(this.currentApi.request);
         }
       }
-      if (this.currentApi && this.currentApi.request && !this.currentApi.request.hashTree) {
+      if (!this.currentApi.request.hashTree) {
         this.currentApi.request.hashTree = [];
       }
-      if (this.currentApi && this.currentApi.request && this.currentApi.request.body && !this.currentApi.request.body.binary) {
+      if (this.currentApi.request.body && !this.currentApi.request.body.binary) {
         this.currentApi.request.body.binary = [];
       }
-      if (this.currentApi.request) {
-        this.currentApi.request.clazzName = TYPE_TO_C.get(this.currentApi.request.type);
-        this.sort(this.currentApi.request.hashTree);
-      }
+      this.currentApi.request.clazzName = TYPE_TO_C.get(this.currentApi.request.type);
+      this.sort(this.currentApi.request.hashTree);
     },
     mockSetting() {
       let mockParam = {};

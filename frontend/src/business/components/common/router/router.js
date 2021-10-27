@@ -6,7 +6,6 @@ import API from "@/business/components/api/router";
 import Performance from "@/business/components/performance/router";
 import Track from "@/business/components/track/router";
 import ReportStatistics from "@/business/components/reportstatistics/router";
-import Project from "@/business/components/project/router";
 import {getCurrentUserId} from "@/common/js/utils";
 
 // const requireContext = require.context('@/business/components/xpack/', true, /router\.js$/);
@@ -29,7 +28,6 @@ const router = new VueRouter({
     Performance,
     Track,
     ReportStatistics,
-    Project
     // ...ReportStatistics
   ]
 });

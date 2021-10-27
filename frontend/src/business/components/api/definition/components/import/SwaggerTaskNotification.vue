@@ -6,6 +6,26 @@
                    @click="handleAddTaskModel">
           {{ $t('organization.message.create_new_notification') }}
         </el-button>
+        <el-popover
+          placement="right-end"
+          title="示例"
+          width="600"
+          trigger="click">
+          <ms-code-edit :read-only="true" height="400px" :data.sync="title" :modes="modes" :mode="'html'"/>
+          <el-button icon="el-icon-warning" plain size="mini" slot="reference" style="margin-left: 10px">
+            {{ $t('organization.message.mail_template_example') }}
+          </el-button>
+        </el-popover>
+        <el-popover
+          placement="right-end"
+          title="示例"
+          width="200"
+          trigger="click">
+          <ms-code-edit :read-only="true" height="200px" :data.sync="robotTitle" :modes="modes" :mode="'text'"/>
+          <el-button icon="el-icon-warning" plain size="mini" slot="reference" style="margin-left: 10px">
+            {{ $t('organization.message.robot_template') }}
+          </el-button>
+        </el-popover>
       </el-col>
     </el-row>
     <el-row>
@@ -66,49 +86,41 @@
           </el-table-column>
           <el-table-column :label="$t('commons.operating')" prop="result" min-width="25%">
             <template v-slot:default="scope">
-              <ms-tip-button
-                circle
+              <el-button
                 type="success"
                 size="mini"
                 v-if="scope.row.isSet"
                 v-xpack
                 @click="handleTemplate(scope.$index,scope.row)"
-                :tip="$t('organization.message.template')"
-                icon="el-icon-tickets"/>
-              <ms-tip-button
-                circle
+              >{{ $t('organization.message.template') }}
+              </el-button>
+              <el-button
                 type="primary"
                 size="mini"
                 v-show="scope.row.isSet"
                 @click="handleAddTask(scope.$index,scope.row)"
-                :tip="$t('commons.add')"
-                icon="el-icon-check"/>
-              <ms-tip-button
-                circle
+              >{{ $t('commons.add') }}
+              </el-button>
+              <el-button
                 size="mini"
                 v-show="scope.row.isSet"
-                @click="removeRowTask(scope.$index,scheduleTask)"
-                :tip="$t('commons.cancel')"
-                icon="el-icon-refresh-left"/>
-              <ms-tip-button
-                el-button
-                circle
+                @click.native.prevent="removeRowTask(scope.$index,scheduleTask)"
+              >{{ $t('commons.cancel') }}
+              </el-button>
+              <el-button
                 type="primary"
                 size="mini"
-                icon="el-icon-edit"
                 v-show="!scope.row.isSet"
-                :tip="$t('commons.edit')"
                 @click="handleEditTask(scope.$index,scope.row)"
-                v-permission="['WORKSPACE_MESSAGE:READ+EDIT']"/>
-              <ms-tip-button
-                circle
+              >{{ $t('commons.edit') }}
+              </el-button>
+              <el-button
                 type="danger"
                 icon="el-icon-delete"
                 size="mini"
                 v-show="!scope.row.isSet"
-                @click="deleteRowTask(scope.$index,scope.row)"
-                :tip="$t('commons.delete')"
-                v-permission="['WORKSPACE_MESSAGE:READ+EDIT']"/>
+                @click.native.prevent="deleteRowTask(scope.$index,scope.row)"
+              ></el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -121,7 +133,6 @@
 <script>
 import {hasLicense} from "@/common/js/utils";
 import MsCodeEdit from "@/business/components/common/components/MsCodeEdit";
-import MsTipButton from "@/business/components/common/components/MsTipButton";
 
 const requireComponent = require.context('@/business/components/xpack/', true, /\.vue$/);
 const noticeTemplate = requireComponent.keys().length > 0 ? requireComponent("./notice/NoticeTemplate.vue") : {};
@@ -129,7 +140,6 @@ const noticeTemplate = requireComponent.keys().length > 0 ? requireComponent("./
 export default {
   name: "SwaggerTaskNotification",
   components: {
-    MsTipButton,
     MsCodeEdit,
     "NoticeTemplate": noticeTemplate.default
   },
@@ -266,21 +276,7 @@ export default {
     },
     handleTemplate(index, row) {
       if (hasLicense()) {
-        let htmlTemplate = "";
-        let robotTemplate = "";
-        switch (row.event) {
-          case 'EXECUTE_SUCCESSFUL':
-            htmlTemplate = this.title;
-            robotTemplate = this.robotTitle;
-            break;
-          case 'EXECUTE_FAILED':
-            htmlTemplate = this.title.replace('成功', '失败');
-            robotTemplate = this.robotTitle.replace('成功', '失败');
-            break;
-          default:
-            break;
-        }
-        this.$refs.noticeTemplate.open(row, htmlTemplate, robotTemplate);
+        this.$refs.noticeTemplate.open(row);
       }
     }
   },

@@ -348,15 +348,4 @@ public class SystemParameterService {
     public void saveBaseurl(String baseurl) {
         extSystemParameterMapper.saveBaseurl(baseurl);
     }
-
-    public SystemParameter getInfo(String key) {
-        return systemParameterMapper.selectByPrimaryKey(key);
-    }
-
-    public void editInfo(SystemParameter systemParameter) {
-        if (StringUtils.isBlank(systemParameter.getParamKey())) {
-            return;
-        }
-        systemParameterMapper.updateByPrimaryKeySelective(systemParameter);
-    }
 }

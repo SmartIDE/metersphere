@@ -5,8 +5,12 @@ import io.metersphere.base.domain.*;
 import io.metersphere.base.mapper.IssuesMapper;
 import io.metersphere.base.mapper.ProjectMapper;
 import io.metersphere.base.mapper.TestCaseIssuesMapper;
+import io.metersphere.base.mapper.WorkspaceMapper;
 import io.metersphere.base.mapper.ext.ExtIssuesMapper;
 import io.metersphere.commons.exception.MSException;
+import io.metersphere.commons.utils.CommonBeanFactory;
+import io.metersphere.commons.utils.EncryptUtils;
+import io.metersphere.commons.utils.LogUtil;
 import io.metersphere.commons.utils.*;
 import io.metersphere.controller.request.IntegrationRequest;
 import io.metersphere.dto.CustomFieldItemDTO;
@@ -58,11 +62,12 @@ public abstract class AbstractIssuePlatform implements IssuesPlatform {
     protected ResourceService resourceService;
     protected RestTemplate restTemplateIgnoreSSL;
     protected UserService userService;
+    protected WorkspaceMapper workspaceMapper;
     protected ProjectMapper projectMapper;
     protected String testCaseId;
     protected String projectId;
     protected String key;
-    protected String workspaceId;
+    protected String orgId;
     protected String userId;
 
 
@@ -93,7 +98,7 @@ public abstract class AbstractIssuePlatform implements IssuesPlatform {
         this();
         this.testCaseId = issuesRequest.getTestCaseId();
         this.projectId = issuesRequest.getProjectId();
-        this.workspaceId = issuesRequest.getWorkspaceId();
+        this.orgId = issuesRequest.getOrganizationId();
         this.userId = issuesRequest.getUserId();
     }
 
@@ -112,10 +117,10 @@ public abstract class AbstractIssuePlatform implements IssuesPlatform {
 
     protected String getPlatformConfig(String platform) {
         IntegrationRequest request = new IntegrationRequest();
-        if (StringUtils.isBlank(workspaceId)) {
-            MSException.throwException("workspace id is null");
+        if (StringUtils.isBlank(orgId)) {
+            MSException.throwException("organization id is null");
         }
-        request.setWorkspaceId(workspaceId);
+        request.setOrgId(orgId);
         request.setPlatform(platform);
 
         ServiceIntegration integration = integrationService.get(request);
@@ -136,10 +141,10 @@ public abstract class AbstractIssuePlatform implements IssuesPlatform {
      */
     public abstract String getProjectId(String projectId);
 
-    protected boolean isIntegratedPlatform(String workspaceId, String platform) {
+    protected boolean isIntegratedPlatform(String orgId, String platform) {
         IntegrationRequest request = new IntegrationRequest();
         request.setPlatform(platform);
-        request.setWorkspaceId(workspaceId);
+        request.setOrgId(orgId);
         ServiceIntegration integration = integrationService.get(request);
         return StringUtils.isNotBlank(integration.getId());
     }
@@ -164,11 +169,11 @@ public abstract class AbstractIssuePlatform implements IssuesPlatform {
     protected void handleTestCaseIssues(IssuesUpdateRequest issuesRequest) {
         String issuesId = issuesRequest.getId();
         if (StringUtils.isNotBlank(issuesRequest.getTestCaseId())) {
-            insertTestCaseIssues(issuesId, issuesRequest.getTestCaseId());
+          insertTestCaseIssues(issuesId, issuesRequest.getTestCaseId());
         } else {
-            List<String> testCaseIds = issuesRequest.getTestCaseIds();
-            TestCaseIssuesExample example = new TestCaseIssuesExample();
-            example.createCriteria().andIssuesIdEqualTo(issuesId);
+          List<String> testCaseIds = issuesRequest.getTestCaseIds();
+          TestCaseIssuesExample example = new TestCaseIssuesExample();
+          example.createCriteria().andIssuesIdEqualTo(issuesId);
             List<TestCaseIssues> testCaseIssues = testCaseIssuesMapper.selectByExample(example);
             List<String> deleteCaseIds = testCaseIssues.stream().map(TestCaseIssues::getTestCaseId).collect(Collectors.toList());
             if (!CollectionUtils.isEmpty(testCaseIds)) {
@@ -176,11 +181,11 @@ public abstract class AbstractIssuePlatform implements IssuesPlatform {
             }
             testCaseIssuesMapper.deleteByExample(example);
             deleteCaseIds.forEach(testCaseIssueService::updateIssuesCount);
-            if (!CollectionUtils.isEmpty(testCaseIds)) {
-                testCaseIds.forEach(caseId -> {
-                    insertTestCaseIssues(issuesId, caseId);
-                });
-            }
+          if (!CollectionUtils.isEmpty(testCaseIds)) {
+              testCaseIds.forEach(caseId -> {
+                  insertTestCaseIssues(issuesId, caseId);
+              });
+          }
         }
     }
 
@@ -227,7 +232,6 @@ public abstract class AbstractIssuePlatform implements IssuesPlatform {
 
     /**
      * 将html格式的缺陷描述转成ms平台的格式
-     *
      * @param htmlDesc
      * @return
      */
@@ -254,7 +258,7 @@ public abstract class AbstractIssuePlatform implements IssuesPlatform {
         while (matcher.find()) {
             String path = matcher.group(2);
             if (endpoint.endsWith("/")) {
-                endpoint = endpoint.substring(0, endpoint.length() - 1);
+                endpoint = endpoint.substring(0, endpoint.length() -1);
             }
             path = " <img src=\"" + endpoint + path + "\"/>";
             result = matcher.replaceFirst(path);
@@ -303,7 +307,7 @@ public abstract class AbstractIssuePlatform implements IssuesPlatform {
             if (url.contains("/resource/md/get/")) {
                 String path = url.substring(url.indexOf("/resource/md/get/"));
                 String name = path.substring(path.indexOf("/resource/md/get/") + 26);
-                String mdLink = "![" + name + "](" + path + ")";
+                String mdLink = "![" + name + "](" + path +  ")";
                 result = matcher.replaceFirst(mdLink);
                 matcher = pattern.matcher(result);
             }
@@ -333,8 +337,8 @@ public abstract class AbstractIssuePlatform implements IssuesPlatform {
         return files;
     }
 
-    protected UserDTO.PlatformInfo getUserPlatInfo(String workspaceId) {
-        return userService.getCurrentPlatformInfo(workspaceId);
+    protected UserDTO.PlatformInfo getUserPlatInfo(String orgId) {
+        return userService.getCurrentPlatformInfo(orgId);
     }
 
     @Override

@@ -131,8 +131,6 @@ public class AppStartListener implements ApplicationListener<ApplicationReadyEve
         initOnceOperate(testPlanScenarioCaseService::initOrderField, "init.sort.plan.api.scenario");
         initOnceOperate(testPlanLoadCaseService::initOrderField, "init.sort.plan.api.load");
         initOnceOperate(testReviewTestCaseService::initOrderField, "init.sort.review.test.case");
-        initOnceOperate(apiDefinitionService::initDefaultModuleId, "init.default.module.id");
-
     }
 
     /**

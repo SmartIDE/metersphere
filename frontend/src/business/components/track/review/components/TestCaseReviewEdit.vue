@@ -46,22 +46,8 @@
               </el-select>
             </el-form-item>
           </el-col>
+
           <el-col :span="12" :offset="1">
-            <el-form-item :label="$t('test_track.review.review_follow_people')" :label-width="formLabelWidth"
-                          prop="followPeople">
-              <el-select v-model="form.followPeople"
-                         clearable
-                         :placeholder="$t('test_track.review.review_follow_people')" filterable size="small">
-                <el-option
-                  v-for="item in maintainerOptions"
-                  :key="item.id"
-                  :label="item.id + ' (' + item.name + ')'"
-                  :value="item.id">
-                </el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
             <el-form-item :label="$t('test_track.review.end_time')" :label-width="formLabelWidth" prop="endTime">
               <el-date-picker @change="endTimeChange" type="datetime" :placeholder="$t('commons.select_date')"
                               v-model="form.endTime" style="width: 100%"/>
@@ -133,8 +119,7 @@ export default {
         userIds: [],
         stage: '',
         description: '',
-        endTime: '',
-        followPeople: '',
+        endTime: ''
       },
       dbProjectIds: [],
       rules: {
@@ -150,8 +135,7 @@ export default {
       },
       formLabelWidth: "100px",
       operationType: '',
-      reviewerOptions: [],
-      maintainerOptions: [],
+      reviewerOptions: []
     };
   },
   computed: {
@@ -159,18 +143,7 @@ export default {
       return getCurrentProjectID();
     }
   },
-  mounted() {
-    this.getSelectOptions();
-  },
   methods: {
-    getSelectOptions(){
-      this.getMaintainerOptions();
-    },
-    getMaintainerOptions() {
-      this.$post('/user/project/member/tester/list', {projectId: getCurrentProjectID()}, response => {
-        this.maintainerOptions = response.data;
-      });
-    },
     reload() {
       this.isStepTableAlive = false;
       this.$nextTick(() => (this.isStepTableAlive = true));
@@ -189,7 +162,6 @@ export default {
       } else {
         this.form.tags = [];
       }
-      this.getSelectOptions();
       listenGoBack(this.close);
       this.dialogFormVisible = true;
       this.reload();

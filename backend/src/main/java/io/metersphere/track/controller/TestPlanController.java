@@ -74,6 +74,11 @@ public class TestPlanController {
         return testPlanService.listTestAllPlan(request);
     }
 
+    @PostMapping("/list/all/relate")
+    public List<TestPlanDTOWithMetric> listRelateAll() {
+        return testPlanService.listRelateAllPlan();
+    }
+
     @GetMapping("recent/{count}/{id}")
     public List<TestPlan> recentTestPlans(@PathVariable("count") int count, @PathVariable("id") String projectId) {
         PageHelper.startPage(1, count, true);

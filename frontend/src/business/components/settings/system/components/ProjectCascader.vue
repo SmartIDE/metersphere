@@ -67,8 +67,10 @@ export default {
         lazyLoad(node, resolve) {
           const {level, value} = node;
           if (level === 0) {
-            self.getWorkspace(resolve);
+            self.getOrganization(resolve);
           } else if (level === 1) {
+            self.getWorkspace(value, resolve);
+          } else if (level === 2) {
             self.getProject(value, resolve);
           } else {
             resolve([]);
@@ -114,8 +116,17 @@ export default {
         }
       });
     },
-    getWorkspace(resolve) {
-      this.$get("workspace/list/", res => {
+    getOrganization(resolve) {
+      this.$get("organization/list", res => {
+        let data = res.data ? res.data : [];
+        if (data.length > 0) {
+          data.forEach(d => d.leaf = false);
+        }
+        resolve(data);
+      })
+    },
+    getWorkspace(condition, resolve) {
+      this.$get("workspace/list/" + condition, res => {
         let data = res.data ? res.data : [];
         if (data.length > 0) {
           data.forEach(d => d.leaf = false);
@@ -141,7 +152,7 @@ export default {
 
 <style scoped>
 .user-cascade >>> .el-dialog {
-  width: 600px;
+  width: 750px;
 }
 
 .user-cascade >>> .el-dialog__body {
@@ -154,6 +165,6 @@ export default {
 
 /deep/ .el-cascader-menu__wrap {
   height: 300px;
-  width: 280px;
+  width: 250px;
 }
 </style>

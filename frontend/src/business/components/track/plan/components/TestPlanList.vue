@@ -75,14 +75,6 @@
           </template>
         </el-table-column>
         <el-table-column
-          v-if="item.id=='followPeople'"
-          prop="followPeople"
-          :label="$t('test_track.plan.follow_people')"
-          show-overflow-tooltip
-          :key="index"
-        >
-        </el-table-column>
-        <el-table-column
           v-if="item.id == 'stage'"
           prop="stage"
           column-key="stage"
@@ -237,7 +229,7 @@
     <ms-test-plan-schedule-maintain ref="scheduleMaintain" @refreshTable="initTableData"/>
     <plan-run-mode-with-env @handleRunBatch="_handleRun" ref="runMode" :plan-case-ids="[]" :type="'plan'" :plan-id="currentPlanId"/>
     <test-plan-report-review ref="testCaseReportView"/>
-    <ms-task-center ref="taskCenter" :show-menu="false"/>
+    <ms-task-center ref="taskCenter"/>
   </el-card>
 </template>
 

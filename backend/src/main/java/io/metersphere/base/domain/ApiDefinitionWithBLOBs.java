@@ -15,7 +15,5 @@ public class ApiDefinitionWithBLOBs extends ApiDefinition implements Serializabl
 
     private String response;
 
-    private String remark;
-
     private static final long serialVersionUID = 1L;
 }

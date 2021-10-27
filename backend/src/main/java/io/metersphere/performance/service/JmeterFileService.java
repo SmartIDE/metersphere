@@ -36,6 +36,9 @@ public class JmeterFileService {
             }
             EngineContext context = EngineFactory.createContext(loadTestReport, ratios, reportId, resourceIndex);
             return zipFilesToByteArray(context);
+        } catch (MSException e) {
+            LogUtil.error(e.getMessage(), e);
+            throw e;
         } catch (Exception e) {
             LogUtil.error(e.getMessage(), e);
             MSException.throwException(e);

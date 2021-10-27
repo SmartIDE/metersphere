@@ -1,6 +1,7 @@
 package io.metersphere.security.realm;
 
 
+import io.metersphere.base.domain.Role;
 import io.metersphere.commons.constants.UserSource;
 import io.metersphere.commons.user.SessionUser;
 import io.metersphere.commons.utils.SessionUtils;
@@ -10,12 +11,15 @@ import io.metersphere.service.UserService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 /**
@@ -44,7 +48,16 @@ public class LdapRealm extends BaseRealm {
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         String userId = (String) principals.getPrimaryPrincipal();
-        return LocalRealm.getAuthorizationInfo(userId, userService);
+        return getAuthorizationInfo(userId, userService);
+    }
+
+    public static AuthorizationInfo getAuthorizationInfo(String userId, UserService userService) {
+        SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
+        // roles 内容填充
+        UserDTO userDTO = userService.getUserDTO(userId);
+        Set<String> roles = userDTO.getRoles().stream().map(Role::getId).collect(Collectors.toSet());
+        authorizationInfo.setRoles(roles);
+        return authorizationInfo;
     }
 
     /**

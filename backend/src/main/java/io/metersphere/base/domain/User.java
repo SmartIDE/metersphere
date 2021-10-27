@@ -23,6 +23,8 @@ public class User implements Serializable {
 
     private String lastWorkspaceId;
 
+    private String lastOrganizationId;
+
     private String phone;
 
     private String source;

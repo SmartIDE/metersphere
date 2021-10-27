@@ -10,11 +10,7 @@ import java.util.List;
 @Setter
 public class QueryTestCaseRequest extends BaseQueryRequest {
 
-    private String id;
-
     private String name;
-
-    private String relationshipType;
 
     private List<String> testCaseIds;
 

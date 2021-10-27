@@ -257,7 +257,7 @@ public class TapdPlatform extends AbstractIssuePlatform {
     }
 
     public String getReporter() {
-        UserDTO.PlatformInfo userPlatInfo = getUserPlatInfo(this.workspaceId);
+        UserDTO.PlatformInfo userPlatInfo = getUserPlatInfo(this.orgId);
         if (userPlatInfo != null && StringUtils.isNotBlank(userPlatInfo.getTapdUserName())) {
             return userPlatInfo.getTapdUserName();
         }

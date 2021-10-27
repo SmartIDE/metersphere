@@ -70,16 +70,12 @@ public class ApiDefinitionImportUtil {
 
     private static void createNodeTree(NodeTree nodeTree, String pid, String projectId,
                                        ApiModuleService apiModuleService, String path, int baseLevel) {
-        ApiModule apiModule = apiModuleService.get(pid);
         ApiModule module = new ApiModule();
         BeanUtils.copyBean(module, nodeTree);
         apiModuleService.buildNewModule(module);
         module.setProjectId(projectId);
         module.setParentId(pid);
         module.setLevel(module.getLevel() + baseLevel);
-        if (apiModule != null) {
-            module.setProtocol(apiModule.getProtocol());
-        }
         createModule(module, SessionUtils.getUserId());
         nodeTree.setNewId(module.getId());
         path = path + nodeTree.getName();
@@ -95,7 +91,6 @@ public class ApiDefinitionImportUtil {
 
     /**
      * 根据导出的模块树，创建新的模块树
-     *
      * @param nodeTree
      * @param projectId
      */
@@ -129,14 +124,12 @@ public class ApiDefinitionImportUtil {
     }
 
     public static void createModule(ApiModule module) {
-        createModule(module, null);
+       createModule(module, null);
     }
 
     public static void createModule(ApiModule module, String userId) {
         ApiModuleService apiModuleService = CommonBeanFactory.getBean(ApiModuleService.class);
-        if (StringUtils.isEmpty(module.getProtocol())) {
-            module.setProtocol(RequestType.HTTP);
-        }
+        module.setProtocol(RequestType.HTTP);
         if (module.getName().length() > 64) {
             module.setName(module.getName().substring(0, 64));
         }

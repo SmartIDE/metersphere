@@ -17,7 +17,7 @@
         </el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
-    <ms-variable-list ref="scenarioParameters" @setVariables="setVariables"/>
+    <ms-variable-list ref="scenarioParameters"/>
     <ms-add-basis-api :currentProtocol="currentProtocol" ref="api"/>
   </div>
 </template>
@@ -63,9 +63,6 @@ export default {
           this.saveAsApi();
           break;
       }
-    },
-    setVariables(v,h){
-      this.data.variables = v;
     },
     getScenario() {
       this.result = this.$get("/api/automation/getApiScenario/" + this.data.id, response => {

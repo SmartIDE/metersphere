@@ -14,6 +14,15 @@ export default class TestPlan extends HashTreeElement {
     super(options);
     this.type = TYPE;
     this.hashTree = [];
+    this.userDefinedVariables = [];
+
+    let elementProp = this.initElementProp('TestPlan.user_defined_variables', 'Arguments');
+    let collectionProp = elementProp.initCollectionProp('Arguments.arguments');
+    collectionProp.forEach(ep => {
+      let name = ep.initStringProp('Argument.name').value;
+      let value = ep.initStringProp('Argument.value').value;
+      this.userDefinedVariables.push({name: name, value: value, enable: true});
+    })
   }
 
   updateProps() {

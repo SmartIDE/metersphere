@@ -1,6 +1,7 @@
 package io.metersphere.security.realm;
 
 
+import io.metersphere.base.domain.Role;
 import io.metersphere.commons.constants.UserSource;
 import io.metersphere.commons.user.SessionUser;
 import io.metersphere.commons.utils.SessionUtils;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 /**
@@ -55,6 +57,10 @@ public class LocalRealm extends BaseRealm {
 
     public static AuthorizationInfo getAuthorizationInfo(String userId, UserService userService) {
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
+        // roles 内容填充
+        UserDTO userDTO = userService.getUserDTO(userId);
+        Set<String> roles = userDTO.getRoles().stream().map(Role::getId).collect(Collectors.toSet());
+        authorizationInfo.setRoles(roles);
         Set<String> userPermission = userService.getUserPermission(userId);
         authorizationInfo.setStringPermissions(userPermission);
         return authorizationInfo;

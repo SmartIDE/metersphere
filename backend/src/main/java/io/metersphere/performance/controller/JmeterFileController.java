@@ -44,10 +44,9 @@ public class JmeterFileController {
     }
 
     @GetMapping("download")
-    public ResponseEntity<byte[]> downloadJmeterFiles(@RequestParam("testId") String testId,
+    public ResponseEntity<byte[]> downloadJmeterFiles(@RequestParam("testId") String testId, @RequestParam("resourceId") String resourceId,
                                                       @RequestParam("ratio") String ratio,
-                                                      @RequestParam("reportId") String reportId,
-                                                      @RequestParam("resourceIndex") int resourceIndex) {
+                                                      @RequestParam("reportId") String reportId, @RequestParam("resourceIndex") int resourceIndex) {
         double[] ratios = Arrays.stream(ratio.split(",")).mapToDouble(Double::parseDouble).toArray();
         byte[] bytes = jmeterFileService.downloadZip(reportId, ratios, resourceIndex);
         return ResponseEntity.ok()

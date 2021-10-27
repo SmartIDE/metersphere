@@ -128,7 +128,6 @@ export default {
       propIsEnumerable: Object.prototype.propertyIsEnumerable
     };
   },
-
   watch: {
     'body.raw'() {
       if (this.body.format !== 'JSON-SCHEMA' && this.body.raw) {
@@ -142,7 +141,7 @@ export default {
           this.body.jsonSchema = "";
         }
       }
-    },
+    }
   },
   methods: {
     isObj(x) {

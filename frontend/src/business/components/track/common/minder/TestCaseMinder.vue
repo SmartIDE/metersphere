@@ -172,7 +172,8 @@ name: "TestCaseMinder",
         this._buildSaveCase(root, saveCases, deleteCases, parent, preNode, nextNode);
       } else {
         let deleteChild = data.deleteChild;
-        if (deleteChild && deleteChild.length > 0 && data.type === 'node') {
+        if (deleteChild && deleteChild.length > 0
+        && data.type === 'node') {
           deleteCases.push(...deleteChild);
         }
 
@@ -276,13 +277,13 @@ name: "TestCaseMinder",
       if (isChange) {
 
         testCase.targetId = null; // 排序处理
-        if (this.isCaseNode(preNode)) {
+        if (preNode) {
           let preId = preNode.data.id;
           if (preId && preId.length > 15) {
             testCase.targetId = preId;
             testCase.moveMode = 'AFTER';
           }
-        } else if (this.isCaseNode(nextNode)) {
+        } else if (nextNode) {
           let nextId = nextNode.data.id;
           if (nextId && nextId.length > 15) {
             testCase.targetId = nextId;
@@ -297,12 +298,6 @@ name: "TestCaseMinder",
         this.$error(tip)
         throw new Error(tip);
       }
-    },
-    isCaseNode(node) {
-      if (node && node.resource && node.resource.indexOf(this.$t('api_test.definition.request.case')) > -1) {
-        return true;
-      }
-      return false;
     },
     buildExtraNode(node) {
       let data = node.data;

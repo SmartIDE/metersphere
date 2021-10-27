@@ -1,12 +1,9 @@
 package io.metersphere.websocket;
 
-import com.alibaba.fastjson.JSON;
 import io.metersphere.base.domain.Notification;
 import io.metersphere.commons.constants.NotificationConstants;
 import io.metersphere.commons.utils.LogUtil;
 import io.metersphere.notice.service.NotificationService;
-import lombok.Builder;
-import lombok.Data;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -101,21 +98,10 @@ public class NotificationWebSocket {
                 notification.setReceiver(userId);
                 notification.setStatus(NotificationConstants.Status.UNREAD.name());
                 int count = notificationService.countNotification(notification);
-                NotificationMessage message = NotificationMessage.builder()
-                        .count(count)
-                        .now(System.currentTimeMillis())
-                        .build();
-                session.getBasicRemote().sendText(JSON.toJSONString(message));
+                session.getBasicRemote().sendText(count + "");
             } catch (Exception e) {
                 LogUtil.error(e.getMessage(), e);
             }
         }
-    }
-
-    @Data
-    @Builder
-    public static class NotificationMessage {
-        private Integer count;
-        private Long now;
     }
 }

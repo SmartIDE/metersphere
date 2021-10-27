@@ -31,7 +31,3 @@ export function editApiDefinitionOrder(request, callback) {
 export function editApiTestCaseOrder(request, callback) {
   return basePost('/api/testcase/edit/order', request, callback);
 }
-
-export function getRelationshipApi(id, relationshipType, callback) {
-  return baseGet('/api/definition/relationship/' + id + '/' + relationshipType, callback);
-}

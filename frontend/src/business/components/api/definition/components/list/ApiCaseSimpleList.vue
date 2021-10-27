@@ -88,18 +88,6 @@
           </ms-table-column>
 
           <ms-table-column
-            prop="caseStatus"
-            :filters="STATUS_FILTERS"
-            :field="item"
-            :fields-width="fieldsWidth"
-            min-width="120px"
-            :label="$t('commons.status')">
-            <template v-slot:default="scope">
-              <plan-status-table-item :value="scope.row.caseStatus"/>
-            </template>
-          </ms-table-column>
-
-          <ms-table-column
             prop="status"
             :filters="statusFilters"
             :field="item"
@@ -185,7 +173,7 @@
         :total="total"/>
     </div>
 
-    <api-case-list @showExecResult="showExecResult" @refreshCase="setRunning" :currentApi="selectCase" ref="caseList"
+    <api-case-list @showExecResult="showExecResult" @refreshCase="initTable" :currentApi="selectCase" ref="caseList"
                    @stop="stop"/>
     <!--批量编辑-->
     <ms-batch-edit ref="batchEdit" :data-count="$refs.caseTable ? $refs.caseTable.selectDataCounts : 0"
@@ -199,7 +187,7 @@
 
     <api-case-batch-run :project-id="projectId" @batchRun="runBatch" ref="batchRun"/>
 
-    <ms-task-center ref="taskCenter" :show-menu="false"/>
+    <ms-task-center ref="taskCenter"/>
 
     <el-dialog :close-on-click-modal="false" :title="$t('test_track.plan_view.test_result')" width="60%"
                :visible.sync="resVisible" class="api-import" destroy-on-close @close="resVisible=false">
@@ -250,7 +238,6 @@ import ApiCaseBatchRun from "@/business/components/api/definition/components/lis
 import MsRequestResultTail from "../../../../api/definition/components/response/RequestResultTail";
 import {editApiTestCaseOrder} from "@/network/api";
 import {TYPE_TO_C} from "@/business/components/api/automation/scenario/Setting";
-import i18n from "@/i18n/i18n";
 
 export default {
   name: "ApiCaseSimpleList",
@@ -276,7 +263,6 @@ export default {
     MsTable,
     MsTableColumn,
     MsRequestResultTail,
-    PlanStatusTableItem: () => import("../../../../track/common/tableItems/plan/PlanStatusTableItem"),
     MsTaskCenter: () => import("../../../../task/TaskCenter"),
   },
   data() {
@@ -352,11 +338,6 @@ export default {
         {text: 'P1', value: 'P1'},
         {text: 'P2', value: 'P2'},
         {text: 'P3', value: 'P3'}
-      ],
-      STATUS_FILTERS: [
-        {text: i18n.t('test_track.plan.plan_status_prepare'), value: 'Prepare'},
-        {text: i18n.t('test_track.plan.plan_status_running'), value: 'Underway'},
-        {text: i18n.t('test_track.plan.plan_status_completed'), value: 'Completed'}
       ],
       statusFilters: [
         {text: this.$t('api_test.automation.success'), value: 'success'},
@@ -558,7 +539,14 @@ export default {
           this.condition.orders.splice(index, 1);
         }
       }
+
       this.enableOrderDrag = this.condition.orders.length > 0 ? false : true;
+
+      if (this.apiDefinitionId) {
+        this.condition.apiDefinitionId = this.apiDefinitionId;
+      }
+      this.condition.status = "";
+      this.condition.moduleIds = this.selectNodeIds;
       if (this.trashEnable) {
         this.condition.moduleIds = [];
         if (this.condition.filters) {
@@ -572,13 +560,41 @@ export default {
           this.condition.filters = {status: ["Trash"]};
         }
       }
-      this.initCondition();
+      if (this.condition.filters && !this.condition.filters.status) {
+        this.$delete(this.condition.filters, 'status');
+      }
+      if (!this.selectAll) {
+        this.selectAll = false;
+        this.unSelection = [];
+        this.selectDataCounts = 0;
+      }
+      this.condition.projectId = this.projectId;
 
+      if (this.currentProtocol != null) {
+        this.condition.protocol = this.currentProtocol;
+      }
+
+      //检查是否只查询本周数据
+      this.isSelectThissWeekData();
+      this.condition.selectThisWeedData = false;
+      this.condition.id = null;
+      if (this.selectDataRange == 'thisWeekCount') {
+        this.condition.selectThisWeedData = true;
+      } else if (this.selectDataRange != null) {
+        let selectParamArr = this.selectDataRange.split("single:");
+
+        if (selectParamArr.length === 2) {
+          this.condition.id = selectParamArr[1];
+        }
+      }
       let isNext = false;
       if (this.condition.projectId) {
         this.result = this.$post('/api/testcase/list/' + this.currentPage + "/" + this.pageSize, this.condition, response => {
           this.total = response.data.itemCount;
           this.tableData = response.data.listObject;
+          if (!this.selectAll) {
+            this.unSelection = response.data.listObject.map(s => s.id);
+          }
           this.tableData.forEach(item => {
             if (item.tags && item.tags.length > 0) {
               item.tags = JSON.parse(item.tags);
@@ -590,6 +606,7 @@ export default {
               isNext = true;
             }
           });
+
           this.$nextTick(() => {
             if (this.$refs.caseTable) {
               this.$refs.caseTable.clear();
@@ -605,14 +622,7 @@ export default {
         });
       }
     },
-    setRunning(id) {
-      this.tableData.forEach(item => {
-        if (id && id === item.id) {
-          item.status = "Running";
-        }
-      });
-    },
-    initCondition() {
+    refreshStatus() {
       if (this.apiDefinitionId) {
         this.condition.apiDefinitionId = this.apiDefinitionId;
       }
@@ -642,9 +652,6 @@ export default {
           this.condition.id = selectParamArr[1];
         }
       }
-    },
-    refreshStatus(id) {
-      this.initCondition();
       if (this.condition.projectId) {
         this.result = this.$post('/api/testcase/list/' + this.currentPage + "/" + this.pageSize, this.condition, response => {
           let isNext = false;
@@ -655,9 +662,6 @@ export default {
                 item.status = tableData[i].status;
                 item.lastResultId = tableData[i].lastResultId;
               }
-            }
-            if (id && id === item.id) {
-              item.status = "Running";
             }
             if (item.status === 'Running') {
               isNext = true;

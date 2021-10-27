@@ -1,7 +1,9 @@
 package io.metersphere.track.service;
 
 import io.metersphere.base.domain.Project;
+import io.metersphere.base.domain.Workspace;
 import io.metersphere.base.mapper.ProjectMapper;
+import io.metersphere.base.mapper.WorkspaceMapper;
 import io.metersphere.commons.constants.IssuesManagePlatform;
 import io.metersphere.track.dto.DemandDTO;
 import io.metersphere.track.issue.AbstractIssuePlatform;
@@ -19,18 +21,20 @@ import java.util.List;
 @Transactional(rollbackFor = Exception.class)
 public class DemandService {
     @Resource
+    private WorkspaceMapper workspaceMapper;
+    @Resource
     private IssuesService issuesService;
     @Resource
     private ProjectMapper projectMapper;
 
     public List<DemandDTO> getDemandList(String projectId) {
         Project project = projectMapper.selectByPrimaryKey(projectId);
-
-        String workspaceId = project.getWorkspaceId();
-        boolean tapd = issuesService.isIntegratedPlatform(workspaceId, IssuesManagePlatform.Tapd.toString());
-        boolean jira = issuesService.isIntegratedPlatform(workspaceId, IssuesManagePlatform.Jira.toString());
-        boolean zentao = issuesService.isIntegratedPlatform(workspaceId, IssuesManagePlatform.Zentao.toString());
-        boolean azureDevops = issuesService.isIntegratedPlatform(workspaceId, IssuesManagePlatform.AzureDevops.toString());
+        Workspace workspace = workspaceMapper.selectByPrimaryKey(project.getWorkspaceId());
+        String orgId = workspace.getOrganizationId();
+        boolean tapd = issuesService.isIntegratedPlatform(orgId, IssuesManagePlatform.Tapd.toString());
+        boolean jira = issuesService.isIntegratedPlatform(orgId, IssuesManagePlatform.Jira.toString());
+        boolean zentao = issuesService.isIntegratedPlatform(orgId, IssuesManagePlatform.Zentao.toString());
+        boolean azureDevops = issuesService.isIntegratedPlatform(orgId, IssuesManagePlatform.AzureDevops.toString());
         List<DemandDTO> list = new ArrayList<>();
         List<String> platforms = new ArrayList<>();
         IssuesRequest issueRequest = new IssuesRequest();
@@ -63,7 +67,7 @@ public class DemandService {
             }
         }
 
-        issueRequest.setWorkspaceId(workspaceId);
+        issueRequest.setOrganizationId(orgId);
         List<AbstractIssuePlatform> platformList = IssueFactory.createPlatforms(platforms, issueRequest);
         platformList.forEach(platform -> {
             List<DemandDTO> demand = platform.getDemandList(projectId);

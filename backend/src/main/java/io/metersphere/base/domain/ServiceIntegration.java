@@ -7,9 +7,9 @@ import lombok.Data;
 public class ServiceIntegration implements Serializable {
     private String id;
 
-    private String platform;
+    private String organizationId;
 
-    private String workspaceId;
+    private String platform;
 
     private String configuration;
 

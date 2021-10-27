@@ -92,9 +92,8 @@ export default {
 }
 
 .el-icon-check {
-  color: #783887;
+  color: #44b349;
   margin-left: 10px;
-  font-weight: bold;
 }
 
 .align-right {

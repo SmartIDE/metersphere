@@ -33,11 +33,7 @@ export default {
     },
     isDisable(btn) {
       if (btn.isDisable) {
-        if (btn.isDisable instanceof Function) {
-          return btn.isDisable(this.row);
-        } else {
-          return btn.isDisable;
-        }
+        return btn.isDisable(this.row);
       }
       return false;
     }

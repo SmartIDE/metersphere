@@ -4,6 +4,9 @@ import {Body} from "../../../../../model/ApiTestModel";
 const DEFAULT_OPTIONS = {
   options: {
     attributes: {
+      guiclass: "HttpTestSampleGui",
+      testclass: "HTTPSamplerProxy",
+      testname: "HTTPSamplerProxy",
       enabled: "true"
     },
   }

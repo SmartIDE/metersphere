@@ -53,7 +53,7 @@
             </el-col>
             <el-col :span="7">
               <el-form-item :label="$t('test_track.case.priority')" prop="level">
-                <el-select class="ms-scenario-input" size="small" v-model="level">
+                <el-select class="ms-scenario-input" size="small" v-model="currentScenario.level">
                   <el-option v-for="item in levels" :key="item.id" :label="item.label" :value="item.id"/>
                 </el-select>
               </el-form-item>
@@ -322,7 +322,7 @@
       <ms-change-history ref="changeHistory"/>
       <el-backtop target=".card-content" :visibility-height="100" :right="50"></el-backtop>
     </div>
-    <ms-task-center ref="taskCenter" :show-menu="false"/>
+    <ms-task-center ref="taskCenter"/>
   </el-card>
 </template>
 
@@ -407,7 +407,6 @@ export default {
       value: API_STATUS[0].id,
       options: API_STATUS,
       levels: PRIORITY,
-      level: "P0",
       scenario: {},
       loading: false,
       showHideTree: true,
@@ -572,7 +571,7 @@ export default {
           this.clearNodeStatus(this.$refs.stepTree.root.childNodes);
           this.clearDebug();
           this.$success(this.$t('report.test_stop_success'));
-          this.showHide();
+          this.reload();
         } catch (e) {
           this.debugLoading = false;
         }

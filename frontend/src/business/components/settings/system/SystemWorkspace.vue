@@ -12,6 +12,7 @@
       >
         <el-table-column prop="name" :label="$t('commons.name')"/>
         <el-table-column prop="description" :label="$t('commons.description')"/>
+        <el-table-column prop="organizationName" :label="$t('workspace.organization_name')"/>
         <el-table-column :label="$t('commons.member')">
           <template v-slot:default="scope">
             <el-link type="primary" class="member-size" @click="cellClick(scope.row)">
@@ -45,6 +46,17 @@
         <el-form-item :label="$t('commons.description')" prop="description">
           <el-input type="textarea" v-model="form.description"></el-input>
         </el-form-item>
+        <el-form-item :label="$t('workspace.organization_name')" prop="organizationId">
+          <el-select filterable v-model="form.organizationId" :placeholder="$t('organization.select_organization')"
+                     class="select-width">
+            <el-option
+              v-for="item in form.orgList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
       </el-form>
       <template v-slot:footer>
         <ms-dialog-footer
@@ -62,6 +74,17 @@
         </el-form-item>
         <el-form-item :label="$t('commons.description')" prop="description">
           <el-input type="textarea" v-model="form.description"></el-input>
+        </el-form-item>
+        <el-form-item :label="$t('workspace.organization_name')" prop="organizationId">
+          <el-select filterable v-model="form.organizationId" :placeholder="$t('organization.select_organization')"
+                     class="select-width">
+            <el-option
+              v-for="item in form.orgList1"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <template v-slot:footer>
@@ -192,6 +215,9 @@ export default {
     create() {
       this.dialogWsAddVisible = true;
       this.form = {};
+      this.$get("/organization/list", response => {
+        this.$set(this.form, "orgList", response.data);
+      });
       listenGoBack(this.close);
     },
     dataFilter(val) {
@@ -234,6 +260,7 @@ export default {
         name: '',
         workspaceId: row.id
       };
+      this.orgId = row.organizationId;
       let path = "/user/special/ws/member/list";
       this.result = this.$post(path + "/" + this.dialogCurrentPage + "/" + this.dialogPageSize, param, res => {
         let data = res.data;
@@ -259,7 +286,7 @@ export default {
       this.result = this.$post(path + "/" + this.dialogCurrentPage + "/" + this.dialogPageSize, param, res => {
         let data = res.data;
         this.memberLineData = data.listObject;
-        let url = "/user/group/list/ws/" + row.id;
+        let url = "/userrole/list/ws/" + row.id;
         // 填充角色信息
         for (let i = 0; i < this.memberLineData.length; i++) {
           this.$get(url + "/" + encodeURIComponent(this.memberLineData[i].id), response => {
@@ -274,6 +301,9 @@ export default {
       this.dialogWsUpdateVisible = true;
       // copy user
       this.form = Object.assign({}, row);
+      this.$get("/organization/list", response => {
+        this.$set(this.form, "orgList1", response.data);
+      });
       listenGoBack(this.close);
     },
     close() {
@@ -440,6 +470,9 @@ export default {
         description: [
           {max: 50, message: this.$t('commons.input_limit', [0, 50]), trigger: 'blur'}
         ],
+        organizationId: [
+          {required: true, message: this.$t('organization.select_organization'), trigger: ['blur']}
+        ]
       },
       wsMemberRule: {
         userIds: [
