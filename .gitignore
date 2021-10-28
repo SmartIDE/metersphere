@@ -32,7 +32,9 @@ target
 .classpath
 .jython_cache
 qywx.json
-.ide/opt/metersphere/data/mysql/*
 *.log
-smartide-osx-20211021.8_755_merge_PullRequest-x64
-
+.ide/opt/metersphere/data/mysql/*   
+.ide/vmstart.txt
+metersphere-online-installer-v1.14.0-rc2.tar.gz
+metersphere-online-installer-v1.14.0-rc2/*
+quick_start.sh
