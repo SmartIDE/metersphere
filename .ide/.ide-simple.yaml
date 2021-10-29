@@ -1,0 +1,100 @@
+version: smartide/v0.2
+orchestrator:
+  type: docker-compose
+  version: 3
+workspace:
+  dev-container:
+    service-name: metersphere
+    webide-port: 6800
+  services:
+    metersphere:
+      image: registry.cn-hangzhou.aliyuncs.com/smartide/smartide-java-opvscode:latest
+      restart: always
+      environment:
+        POSTGRES_HOST_AUTH_METHOD: trust
+        ROOT_PASSWORD: root123
+      volumes:
+        - .:/home/project
+        - ./.ide/opt/metersphere:/opt/metersphere
+      expose:
+        - 3000
+      ports:
+        - 8081:8081
+      networks:
+        - smartide-network
+    mysql:
+      image: registry.cn-qingdao.aliyuncs.com/metersphere/mysql:5.7.33
+      container_name: mysql
+      healthcheck:
+        test:
+          [
+            "CMD",
+            "mysqladmin",
+            "ping",
+            "-h",
+            "localhost",
+            "-uroot",
+            "-pPassword123@mysql",
+          ]
+        interval: 6s
+        timeout: 5s
+        retries: 10
+      environment:
+        MYSQL_DATABASE: metersphere
+        MYSQL_ROOT_PASSWORD: Password123@mysql
+      ports:
+        - 3306:3306
+      volumes:
+        - ./.ide/opt/metersphere/conf/my.cnf:/etc/mysql/conf.d/my.cnf
+        - ./.ide/opt/metersphere/bin/mysql:/docker-entrypoint-initdb.d/
+        - ms-mysql-data:/var/lib/mysql
+      networks:
+        - smartide-network
+  networks:
+    smartide-network:
+      driver: bridge
+      ipam:
+        driver: default
+        config:
+          - subnet: 172.30.10.0/24
+  volumes:
+    ms-zookeeper-data:
+      driver_opts:
+        type: none
+        device: ./.ide/opt/metersphere/data/zookeeper
+        o: bind
+    ms-kafka-data:
+      driver_opts:
+        type: none
+        device: ./.ide/opt/metersphere/data/kafka
+        o: bind
+    ms-mysql-data:
+      driver_opts:
+        type: none
+        device: ./.ide/opt/metersphere/data/mysql
+        o: bind
+    ms-prometheus-data:
+      driver_opts:
+        type: none
+        device: ./.ide/opt/metersphere/data/prometheus
+        o: bind
+    ms-prometheus-conf:
+      driver_opts:
+        type: none
+        device: ./.ide/opt/metersphere/conf/prometheus
+        o: bind
+    ms-conf:
+      driver_opts:
+        type: none
+        device: ./.ide/opt/metersphere/conf
+        o: bind
+    ms-logs:
+      driver_opts:
+        type: none
+        device: ./.ide/opt/metersphere/logs
+        o: bind
+    ms-data:
+      driver_opts:
+        type: none
+        device: ./.ide/opt/metersphere/data
+        o: bind
