@@ -66,8 +66,7 @@ workspace:
         KAFKA_REPORT_TOPIC: JMETER_REPORTS
         KAFKA_BOOTSTRAP-SERVERS: 10000-10010:10000-10010
       depends_on:
-        kafka:
-          condition: service_healthy
+        - kafka
       healthcheck:
         test: ["CMD", "nc", "-zv", "localhost", "8084"]
         interval: 6s
