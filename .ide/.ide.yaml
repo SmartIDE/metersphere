@@ -6,6 +6,7 @@ workspace:
   dev-container:
     service-name: metersphere
     webide-port: 6800
+    ide-type: vscode
   services:
     metersphere:
       image: registry.cn-hangzhou.aliyuncs.com/smartide/smartide-java-opvscode:latest
