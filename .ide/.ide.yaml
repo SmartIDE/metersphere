@@ -17,6 +17,8 @@ workspace:
       volumes:
         - .:/home/project
         - ./.ide/opt/metersphere:/opt/metersphere
+        - $HOME/.m2:/root/.m2
+        - $HOME/.npm:/root/.npm
       expose:
         - 3000
       ports:
